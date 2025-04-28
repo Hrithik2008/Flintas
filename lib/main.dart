@@ -1,46 +1,101 @@
 import 'package:flutter/material.dart';
-import 'core/providers/service_provider.dart';
-import 'core/services/habit_service.dart';
-import 'core/services/ripple_service.dart';
-import 'core/services/connection_service.dart';
-import 'services/profile_service.dart';
-import 'features/auth/login_screen.dart';
-import 'features/dashboard/dashboard_screen.dart';
-import 'features/profile/profile_screen.dart';
-import 'features/connections/connection_screen.dart';
-import 'features/ripple/ripple_screen.dart';
+import 'package:provider/provider.dart';
+import 'core/theme.dart';
+import 'services/database_service.dart';
+import 'models/user.dart';
 import 'features/habits/habits_screen.dart';
+import 'features/world/world_screen.dart';
+import 'features/profile/profile_screen.dart';
+import 'features/teams/teams_screen.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final databaseService = DatabaseService();
+  await databaseService.database; // Initialize database
+  runApp(MyApp(databaseService: databaseService));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  final DatabaseService databaseService;
+
+  const MyApp({Key? key, required this.databaseService}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return ServiceProvider(
-      habitService: HabitService(),
-      rippleService: RippleService(),
-      connectionService: ConnectionService(),
-      profileService: ProfileService(),
+    return MultiProvider(
+      providers: [
+        Provider<DatabaseService>.value(value: databaseService),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+      ],
       child: MaterialApp(
-        title: 'Ripple App',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-        ),
-        initialRoute: '/login',
-        routes: {
-          '/login': (context) => const LoginScreen(),
-          '/dashboard': (context) => const DashboardScreen(),
-          '/profile': (context) => const ProfileScreen(),
-          '/connections': (context) => const ConnectionScreen(),
-          '/ripple': (context) => const RippleScreen(),
-          '/habits': (context) => const HabitsScreen(),
-        },
+        title: 'Habit World',
+        theme: AppTheme.theme,
+        home: const MainScreen(),
       ),
     );
+  }
+}
+
+class MainScreen extends StatefulWidget {
+  const MainScreen({Key? key}) : super(key: key);
+
+  @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  int _selectedIndex = 0;
+
+  final List<Widget> _screens = [
+    const HabitsScreen(),
+    const WorldScreen(),
+    const TeamsScreen(),
+    const ProfileScreen(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _screens[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: (index) => setState(() => _selectedIndex = index),
+        type: BottomNavigationBarType.fixed,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.check_circle_outline),
+            label: 'Habits',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.landscape),
+            label: 'World',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.people_outline),
+            label: 'Teams',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            label: 'Profile',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class UserProvider extends ChangeNotifier {
+  User? _user;
+
+  User? get user => _user;
+
+  void setUser(User user) {
+    _user = user;
+    notifyListeners();
+  }
+
+  void updateUser(User user) {
+    _user = user;
+    notifyListeners();
   }
 }

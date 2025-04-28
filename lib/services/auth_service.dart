@@ -19,9 +19,8 @@ class AuthService extends ChangeNotifier {
     // Mock validation
     if (admissionNumber.isNotEmpty && email.isNotEmpty) {
       _currentUser = User(
-        admissionNumber: admissionNumber,
-        email: email,
-        name: 'Student ${admissionNumber.substring(0, 3)}',
+        username: 'Student ${admissionNumber.substring(0, 3)}',
+        track: 'Mindfulness', // Default track
       );
       _isLoading = false;
       notifyListeners();
