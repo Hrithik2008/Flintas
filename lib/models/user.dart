@@ -1,73 +1,41 @@
 import 'habit.dart';
-import 'package:uuid/uuid.dart';
 
 class User {
-  final String id;
-  final String username;
-  final String track;
-  final int xp;
-  final int worldLevel;
-  final List<String> badges;
-  final List<String> teamIds;
-  final DateTime createdAt;
+  final String admissionNumber;
+  final String email;
+  final String name;
+  final List<String> interests;
+  final int xpPoints;
+  final List<Habit> activeHabits;
+  final List<String> goals;
 
   User({
-    String? id,
-    required this.username,
-    required this.track,
-    this.xp = 0,
-    this.worldLevel = 1,
-    List<String>? badges,
-    List<String>? teamIds,
-    DateTime? createdAt,
-  })  : id = id ?? const Uuid().v4(),
-        badges = badges ?? [],
-        teamIds = teamIds ?? [],
-        createdAt = createdAt ?? DateTime.now();
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'username': username,
-      'track': track,
-      'xp': xp,
-      'worldLevel': worldLevel,
-      'badges': badges,
-      'teamIds': teamIds,
-      'createdAt': createdAt.toIso8601String(),
-    };
-  }
-
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
-      id: json['id'],
-      username: json['username'],
-      track: json['track'],
-      xp: json['xp'],
-      worldLevel: json['worldLevel'],
-      badges: List<String>.from(json['badges']),
-      teamIds: List<String>.from(json['teamIds']),
-      createdAt: DateTime.parse(json['createdAt']),
-    );
-  }
+    required this.admissionNumber,
+    required this.email,
+    required this.name,
+    this.interests = const [],
+    this.xpPoints = 0,
+    this.activeHabits = const [],
+    this.goals = const [],
+  });
 
   User copyWith({
-    String? username,
-    String? track,
-    int? xp,
-    int? worldLevel,
-    List<String>? badges,
-    List<String>? teamIds,
+    String? admissionNumber,
+    String? email,
+    String? name,
+    List<String>? interests,
+    int? xpPoints,
+    List<Habit>? activeHabits,
+    List<String>? goals,
   }) {
     return User(
-      id: id,
-      username: username ?? this.username,
-      track: track ?? this.track,
-      xp: xp ?? this.xp,
-      worldLevel: worldLevel ?? this.worldLevel,
-      badges: badges ?? this.badges,
-      teamIds: teamIds ?? this.teamIds,
-      createdAt: createdAt,
+      admissionNumber: admissionNumber ?? this.admissionNumber,
+      email: email ?? this.email,
+      name: name ?? this.name,
+      interests: interests ?? this.interests,
+      xpPoints: xpPoints ?? this.xpPoints,
+      activeHabits: activeHabits ?? this.activeHabits,
+      goals: goals ?? this.goals,
     );
   }
 } 
